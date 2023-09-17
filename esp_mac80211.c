@@ -790,6 +790,14 @@ static int esp_op_set_tim(struct ieee80211_hw *hw, struct ieee80211_sta *sta,
 }
 #endif
 
+static void esp_op_wake_tx_queue(struct ieee80211_hw *hw,
+                              struct ieee80211_txq *txq)
+{
+        struct esp_pub *epub = (struct esp_pub *) hw->priv;
+        if (epub)
+             ieee80211_queue_work(hw, &epub->tx_work);
+}
+
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 30))
 static int esp_op_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
                           struct ieee80211_vif *vif, struct ieee80211_sta *sta,
@@ -1936,6 +1944,7 @@ static const struct ieee80211_ops esp_mac80211_ops = {
         .prepare_multicast = esp_op_prepare_multicast,
 #endif
         .configure_filter = esp_op_configure_filter,
+        .wake_tx_queue = esp_op_wake_tx_queue,
         .set_key = esp_op_set_key,
         .update_tkip_key = esp_op_update_tkip_key,
         //.sched_scan_start = esp_op_sched_scan_start,
